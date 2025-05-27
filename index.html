@@ -817,22 +817,22 @@
             const barSpacing = 40;
             const labelX = 10;
             const chartStartX = 180; // Adjusted for longer labels
-            const chartWidth = canvas.width - chartStartX - 50; // Remaining width for bars
-            const scoreLabelOffset = 10;
+            const chartWidth = canvas.width - chartStartX - 120; // More space for scores on the right
+            const scoreLabelX = chartStartX + chartWidth + 10; // Position scores after the bars
 
             const groupData = [
                 { label: 'Edad 15-24', average: 28, groupType: 'age', groupValue: '15-24' },
                 { label: 'Edad 25-34', average: 30, groupType: 'age', groupValue: '25-34' },
                 { label: 'Edad 35-44', average: 32, groupType: 'age', groupValue: '35-44' },
-                { label: 'Edad 45-60', average: 31, groupType: 'age', groupValue: '45-60' }, // Added
-                { label: 'Edad 60+', average: 34, groupType: 'age', groupValue: '60+' },     // Added
+                { label: 'Edad 45-60', average: 31, groupType: 'age', groupValue: '45-60' }, 
+                { label: 'Edad 60+', average: 34, groupType: 'age', groupValue: '60+' },     
                 { label: 'Hombre', average: 27, groupType: 'gender', groupValue: 'male' },
                 { label: 'Mujer', average: 31, groupType: 'gender', groupValue: 'female' },
-                { label: 'Otro Género', average: 29, groupType: 'gender', groupValue: 'other' }, // Added
-                { label: 'Prefiero no decirlo', average: 30, groupType: 'gender', groupValue: 'no-answer' }, // Added
+                { label: 'Otro Género', average: 29, groupType: 'gender', groupValue: 'other' }, 
+                { label: 'Prefiero no decirlo', average: 30, groupType: 'gender', groupValue: 'no-answer' }, 
                 { label: 'Ingresos < 1000€', average: 26, groupType: 'income', groupValue: '<1000' },
-                { label: 'Ingresos 1000-1500€', average: 29, groupType: 'income', groupValue: '1000-1500' }, // Added
-                { label: 'Ingresos 1500-2000€', average: 31, groupType: 'income', groupValue: '1500-2000' }, // Added
+                { label: 'Ingresos 1000-1500€', average: 29, groupType: 'income', groupValue: '1000-1500' }, 
+                { label: 'Ingresos 1500-2000€', average: 31, groupType: 'income', groupValue: '1500-2000' }, 
                 { label: 'Ingresos > 2000€', average: 33, groupType: 'income', groupValue: '>2000' }
             ];
 
@@ -890,11 +890,11 @@
                 ctx.fillStyle = userBarColor;
                 ctx.fillRect(chartStartX, y + barHeight / 2 - 5, userBarLength, 10); // Thinner bar for user score, centered
 
-                // Draw average score text
+                // Draw average score text (moved to the right)
                 ctx.fillStyle = '#333';
                 ctx.textAlign = 'left';
                 ctx.font = '12px Arial';
-                ctx.fillText(`${group.average} pts`, chartStartX + averageBarLength + scoreLabelOffset, y + barHeight / 2);
+                ctx.fillText(`${group.average} pts`, scoreLabelX, y + barHeight / 2);
 
             });
 
