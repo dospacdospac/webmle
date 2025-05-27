@@ -143,7 +143,7 @@
         .submit-container {
             padding: 30px;
             text-align: center;
-            background: #f0ff0;
+            background: #f0f8f0;
         }
 
         .submit-btn {
@@ -222,6 +222,14 @@
             height: auto;
             border-radius: 10px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        #groupComparisonChart {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
         }
 
         .open-answers {
@@ -556,29 +564,13 @@
 
             <div class="chart-container">
                 <div class="chart-title">📊 Comparación con la Media General</div>
-                <canvas id="scoreChart" width="400" height="200"></canvas>
+                <canvas id="scoreChart" width="600" height="200"></canvas>
             </div>
-<div class="chart-container">
-    <div class="chart-title">📋 Comparativa por Grupos</div>
-    <table style="width:100%; border-collapse: collapse; background: #f9fdf9; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-        <thead style="background: #d0ecd0; color: #1e4a1e;">
-            <tr>
-                <th style="padding: 12px; text-align: left;">Grupo</th>
-                <th style="padding: 12px; text-align: center;">Puntuación Promedio</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr><td style="padding: 10px;">Edad 15-24</td><td style="text-align: center;">28</td></tr>
-            <tr><td style="padding: 10px;">Edad 25-34</td><td style="text-align: center;">30</td></tr>
-            <tr><td style="padding: 10px;">Edad 35-44</td><td style="text-align: center;">32</td></tr>
-            <tr><td style="padding: 10px;">Hombre</td><td style="text-align: center;">27</td></tr>
-            <tr><td style="padding: 10px;">Mujer</td><td style="text-align: center;">31</td></tr>
-            <tr><td style="padding: 10px;">Ingresos &lt; 1000€</td><td style="text-align: center;">26</td></tr>
-            <tr><td style="padding: 10px;">Ingresos &gt; 2000€</td><td style="text-align: center;">33</td></tr>
-        </tbody>
-    </table>
-</div>
-
+            
+            <div class="chart-container">
+                <div class="chart-title">📋 Comparativa por Grupos</div>
+                <canvas id="groupComparisonChart" width="600" height="350"></canvas>
+            </div>
 
             <div id="openAnswers" class="open-answers">
                 <h3>💭 Tus Reflexiones</h3>
@@ -745,8 +737,11 @@
                 answersContent.innerHTML = '<p style="color: #666; font-style: italic;">No has proporcionado respuestas a las preguntas abiertas.</p>';
             }
 
-            // Crear gráfico
+            // Crear gráfico de comparación general
             createChart(totalScore);
+
+            // Crear gráfico de comparación por grupos
+            createGroupComparisonChart(totalScore, formData);
 
             // Mostrar sección de resultados
             document.getElementById('results').style.display = 'block';
@@ -766,8 +761,8 @@
             // Configuración del gráfico
             const barHeight = 40;
             const barSpacing = 60;
-            const maxBarWidth = 300;
-            const startX = 80;
+            const maxBarWidth = canvas.width - 200; // Adjust max bar width for wider canvas
+            const startX = 120; // Adjust starting X to make space for labels
             const startY = 30;
             
             // Calcular anchuras de barras
@@ -808,6 +803,88 @@
             ctx.fillStyle = '#666';
             ctx.fillText('0', startX, startY + barSpacing + 60);
             ctx.fillText(maxScore, startX + maxBarWidth, startY + barSpacing + 60);
+        }
+
+        function createGroupComparisonChart(userScore, formData) {
+            const canvas = document.getElementById('groupComparisonChart');
+            const ctx = canvas.getContext('2d');
+            
+            // Limpiar canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const maxScore = 45;
+            const barHeight = 25;
+            const barSpacing = 40;
+            const labelX = 10;
+            const chartStartX = 180; // Adjusted for longer labels
+            const chartWidth = canvas.width - chartStartX - 50; // Remaining width for bars
+            const scoreLabelOffset = 10;
+
+            const groupData = [
+                { label: 'Edad 15-24', average: 28, applies: formData.get('age') === '15-24' },
+                { label: 'Edad 25-34', average: 30, applies: formData.get('age') === '25-34' },
+                { label: 'Edad 35-44', average: 32, applies: formData.get('age') === '35-44' },
+                { label: 'Hombre', average: 27, applies: formData.get('gender') === 'male' },
+                { label: 'Mujer', average: 31, applies: formData.get('gender') === 'female' },
+                { label: 'Ingresos < 1000€', average: 26, applies: formData.get('income') === '<1000' },
+                { label: 'Ingresos > 2000€', average: 33, applies: formData.get('income') === '>2000' }
+            ];
+
+            ctx.font = '14px Arial';
+            ctx.textBaseline = 'middle';
+
+            groupData.forEach((group, index) => {
+                const y = 30 + index * barSpacing;
+
+                // Draw group label
+                ctx.fillStyle = '#2d5d2d';
+                ctx.textAlign = 'left';
+                ctx.fillText(group.label, labelX, y + barHeight / 2);
+
+                // Draw average bar
+                const averageBarLength = (group.average / maxScore) * chartWidth;
+                ctx.fillStyle = '#B0C4DE'; // Light blue for average
+                ctx.fillRect(chartStartX, y, averageBarLength, barHeight);
+
+                // Draw user score bar
+                const userBarLength = (userScore / maxScore) * chartWidth;
+                let userBarColor;
+                if (userScore > group.average) {
+                    userBarColor = '#4CAF50'; // Green if user is higher
+                } else if (userScore < group.average) {
+                    userBarColor = '#F44336'; // Red if user is lower
+                } else {
+                    userBarColor = '#FFC107'; // Amber if equal
+                }
+                ctx.fillStyle = userBarColor;
+                ctx.fillRect(chartStartX, y + barHeight / 2 - 5, userBarLength, 10); // Thinner bar for user score, centered
+
+                // Draw average score text
+                ctx.fillStyle = '#333';
+                ctx.textAlign = 'left';
+                ctx.font = '12px Arial';
+                ctx.fillText(`${group.average} pts`, chartStartX + averageBarLength + scoreLabelOffset, y + barHeight / 2);
+
+                // Draw user score text (only if this group applies to the user)
+                if (group.applies) {
+                    ctx.fillStyle = '#1e4a1e';
+                    ctx.font = 'bold 14px Arial';
+                    ctx.fillText(`${userScore} pts (Tú)`, chartStartX + userBarLength + scoreLabelOffset, y + barHeight / 2 - 10);
+                }
+            });
+
+            // Draw axis at the bottom
+            ctx.fillStyle = '#666';
+            ctx.font = '12px Arial';
+            ctx.textAlign = 'left';
+            ctx.fillText('0', chartStartX, canvas.height - 10);
+            ctx.textAlign = 'right';
+            ctx.fillText(maxScore, chartStartX + chartWidth, canvas.height - 10);
+            ctx.strokeStyle = '#ccc';
+            ctx.beginPath();
+            ctx.moveTo(chartStartX, canvas.height - 20);
+            ctx.lineTo(chartStartX + chartWidth, canvas.height - 20);
+            ctx.stroke();
         }
     </script>
 </body>
