@@ -143,7 +143,7 @@
         .submit-container {
             padding: 30px;
             text-align: center;
-            background: #f0f8f0;
+            background: #f0ff0;
         }
 
         .submit-btn {
@@ -288,7 +288,6 @@
 
         <div class="form-container">
             <form id="sustainabilityForm">
-                <!-- Sección 1: Datos Demográficos -->
                 <fieldset>
                     <legend>🧾 Datos Demográficos</legend>
                     
@@ -341,7 +340,6 @@
                     </div>
                 </fieldset>
 
-                <!-- Sección 2: Hábitos de Compra -->
                 <fieldset>
                     <legend>👚 Hábitos de Compra</legend>
                     
@@ -411,7 +409,6 @@
                     </div>
                 </fieldset>
 
-                <!-- Sección 3: Conciencia -->
                 <fieldset>
                     <legend>🌱 Conciencia Ambiental</legend>
                     
@@ -461,7 +458,6 @@
                     </div>
                 </fieldset>
 
-                <!-- Sección 4: Comportamientos -->
                 <fieldset>
                     <legend>🔄 Comportamientos Sostenibles</legend>
                     
@@ -531,7 +527,6 @@
                     </div>
                 </fieldset>
 
-                <!-- Sección 5: Respuestas Abiertas -->
                 <fieldset>
                     <legend>💬 Reflexiones Personales</legend>
                     
@@ -552,7 +547,6 @@
             </form>
         </div>
 
-        <!-- Resultados -->
         <div id="results" class="results">
             <div id="scoreDisplay" class="score-display">
                 <div id="scoreNumber" class="score-number"></div>
@@ -620,16 +614,13 @@
                     }
                 });
             });
-        });
 
-        
-document.getElementById('submitButton').addEventListener('click', function(e) {
-    e.preventDefault();
-    if (validateForm()) {
-        calculateAndShowResults();
-    }
-});
-    
+            document.getElementById('submitButton').addEventListener('click', function(e) {
+                e.preventDefault();
+                if (validateForm()) {
+                    calculateAndShowResults();
+                }
+            });
         });
 
         function validateForm() {
@@ -818,3 +809,6 @@ document.getElementById('submitButton').addEventListener('click', function(e) {
             ctx.fillText('0', startX, startY + barSpacing + 60);
             ctx.fillText(maxScore, startX + maxBarWidth, startY + barSpacing + 60);
         }
+    </script>
+</body>
+</html>
