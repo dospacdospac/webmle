@@ -821,25 +821,56 @@
             const scoreLabelOffset = 10;
 
             const groupData = [
-                { label: 'Edad 15-24', average: 28, applies: formData.get('age') === '15-24' },
-                { label: 'Edad 25-34', average: 30, applies: formData.get('age') === '25-34' },
-                { label: 'Edad 35-44', average: 32, applies: formData.get('age') === '35-44' },
-                { label: 'Hombre', average: 27, applies: formData.get('gender') === 'male' },
-                { label: 'Mujer', average: 31, applies: formData.get('gender') === 'female' },
-                { label: 'Ingresos < 1000€', average: 26, applies: formData.get('income') === '<1000' },
-                { label: 'Ingresos > 2000€', average: 33, applies: formData.get('income') === '>2000' }
+                { label: 'Edad 15-24', average: 28, groupType: 'age', groupValue: '15-24' },
+                { label: 'Edad 25-34', average: 30, groupType: 'age', groupValue: '25-34' },
+                { label: 'Edad 35-44', average: 32, groupType: 'age', groupValue: '35-44' },
+                { label: 'Edad 45-60', average: 31, groupType: 'age', groupValue: '45-60' }, // Added
+                { label: 'Edad 60+', average: 34, groupType: 'age', groupValue: '60+' },     // Added
+                { label: 'Hombre', average: 27, groupType: 'gender', groupValue: 'male' },
+                { label: 'Mujer', average: 31, groupType: 'gender', groupValue: 'female' },
+                { label: 'Otro Género', average: 29, groupType: 'gender', groupValue: 'other' }, // Added
+                { label: 'Prefiero no decirlo', average: 30, groupType: 'gender', groupValue: 'no-answer' }, // Added
+                { label: 'Ingresos < 1000€', average: 26, groupType: 'income', groupValue: '<1000' },
+                { label: 'Ingresos 1000-1500€', average: 29, groupType: 'income', groupValue: '1000-1500' }, // Added
+                { label: 'Ingresos 1500-2000€', average: 31, groupType: 'income', groupValue: '1500-2000' }, // Added
+                { label: 'Ingresos > 2000€', average: 33, groupType: 'income', groupValue: '>2000' }
             ];
 
-            ctx.font = '14px Arial';
+            const userAge = formData.get('age');
+            const userGender = formData.get('gender');
+            const userIncome = formData.get('income');
+
             ctx.textBaseline = 'middle';
 
             groupData.forEach((group, index) => {
                 const y = 30 + index * barSpacing;
 
+                // Determine if this group applies to the user
+                const appliesToUser = 
+                    (group.groupType === 'age' && group.groupValue === userAge) ||
+                    (group.groupType === 'gender' && group.groupValue === userGender) ||
+                    (group.groupType === 'income' && group.groupValue === userIncome);
+
                 // Draw group label
                 ctx.fillStyle = '#2d5d2d';
                 ctx.textAlign = 'left';
-                ctx.fillText(group.label, labelX, y + barHeight / 2);
+                
+                // Bold and underline if it applies to the user
+                if (appliesToUser) {
+                    ctx.font = 'bold 14px Arial'; // Set bold font
+                    ctx.fillText(group.label, labelX, y + barHeight / 2);
+                    // Draw underline
+                    const textWidth = ctx.measureText(group.label).width;
+                    ctx.beginPath();
+                    ctx.strokeStyle = '#2d5d2d';
+                    ctx.lineWidth = 1;
+                    ctx.moveTo(labelX, y + barHeight / 2 + 8); // Position the underline slightly below text
+                    ctx.lineTo(labelX + textWidth, y + barHeight / 2 + 8);
+                    ctx.stroke();
+                } else {
+                    ctx.font = '14px Arial'; // Regular font
+                    ctx.fillText(group.label, labelX, y + barHeight / 2);
+                }
 
                 // Draw average bar
                 const averageBarLength = (group.average / maxScore) * chartWidth;
@@ -865,12 +896,6 @@
                 ctx.font = '12px Arial';
                 ctx.fillText(`${group.average} pts`, chartStartX + averageBarLength + scoreLabelOffset, y + barHeight / 2);
 
-                // Draw user score text (only if this group applies to the user)
-                if (group.applies) {
-                    ctx.fillStyle = '#1e4a1e';
-                    ctx.font = 'bold 14px Arial';
-                    ctx.fillText(`${userScore} pts (Tú)`, chartStartX + userBarLength + scoreLabelOffset, y + barHeight / 2 - 10);
-                }
             });
 
             // Draw axis at the bottom
